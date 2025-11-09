@@ -1,126 +1,162 @@
-1. Clone the Repository
+Delivery Distance App
 
+A full-stack application to calculate and visualize delivery distances between addresses.
+Built with a FastAPI backend and a Svelte frontend, using PostgreSQL (Neon) for storage and Redis (Upstash) for caching.
+
+Clone the Repository
 git clone https://github.com/deepikavenkatesulu009-bot/delivery-distance-app.git
-
 cd delivery-distance-app
 
-
-2. Database and Redis Setup
+Database and Redis Setup
 
 The backend uses PostgreSQL and Redis.
-You can run local instances for development, or you can connect directly to the existing production databases (Neon for Postgres and Upstash for Redis).
+You can run local instances for development, or connect directly to the existing production databases (Neon for Postgres and Upstash for Redis).
 
 Update your .env file
 
-Make sure your .env file (in the project root) includes the correct database and cache URLs:
+Create a file named .env in the project root (same folder as app/ or main.py) and include:
+
+Example .env
 PORT=8000
 DATABASE_URL=postgresql://postgres:password@localhost:5432/mydb
 REDIS_URL=redis://localhost:6379
-USER_AGENT=delivery-distance-app/1.0 (<your_email@example.com>)
-NOMINATIM_CONTACT_EMAIL=<your_email@example.com>
+USER_AGENT=delivery-distance-app/1.0 (your_email@example.com)
+NOMINATIM_CONTACT_EMAIL=your_email@example.com
 CORS_ORIGINS=*
 
 
+Important Notes
 
 Do not include quotation marks around any values.
 
-Local vs. Production Connections
+If you do not have local Postgres or Redis installed, the backend will automatically use the production Neon and Upstash links defined in your environment.
 
-If you have local Postgres or Redis installed, you can replace these URLs with your local connection strings (for example: postgresql://postgres:password@localhost:5432/mydb and redis://localhost:6379).
+For production Redis (Upstash), always use the rediss:// scheme to enable TLS encryption.
 
-3. Backend Setup (FastAPI)
-
-Create a virtual environment
+Backend Setup (FastAPI)
+1. Create a virtual environment
 python3 -m venv venv
 source venv/bin/activate   # macOS/Linux
-# OR
-venv\Scripts\activate      # Windows
+ OR (Windows)
+venv\Scripts\activate
 
-Install dependencies
+2. Install dependencies
 pip install --upgrade pip
 pip install -r requirements.txt
 
-
-
-Start the backend
+3. Start the backend
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
-Once it starts, open:
 
-Test endpoints
+If your FastAPI app is defined in a different file (e.g., main.py in the root), use:
+
+uvicorn main:app --reload
+
+
+Once it starts, open your browser at:
+
+http://localhost:8000/docs
+
+Test Endpoints
 curl http://localhost:8000/health
 
+
 Expected output:
+
 {"status": "ok"}
 
+Frontend Setup (Svelte)
+1. Navigate to frontend folder
 
-4. Frontend Setup (Svelte)
-Navigate to frontend folder
-If your frontend is in a frontend or ui subfolder, go there:
+If your frontend is located in a folder named frontend or ui, navigate into it:
+
 cd frontend
-# or cd ui
+or cd ui
 
-Install dependencies
+2. Install dependencies
 npm install
 
-Start the development server
+3. Start the development server
 npm run dev
 
+
 The frontend will start on:
+
 http://localhost:5173
-If it needs to connect to the backend, make sure the backend URL in your frontend .env or configuration file points to:
+
+
+Make sure your frontend API configuration (e.g., .env or constants file) points to your backend URL:
+
 http://localhost:8000
 
+Run Both Together
 
+Open two terminals.
 
-5. Run Both Together
-Using two terminals
-Terminal 1:
+Terminal 1 – Backend:
+
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
-Terminal 2:
+
+Terminal 2 – Frontend:
+
 cd frontend
 npm run dev
 
-Now open your browser:
-http://localhost:5173
-The frontend should communicate with backend at http://localhost:8000
 
-6. Run with Docker (optional)
-Build and run locally:
+Now open:
+
+Frontend: http://localhost:5173
+Backend:  http://localhost:8000
+
+
+The frontend should communicate with the backend successfully.
+
+Run with Docker (optional)
+
+If you prefer to use Docker instead of a Python virtual environment:
+
 docker build -t delivery-distance-app .
 docker run --rm --platform=linux/amd64 --env-file .env -p 8000:8000 delivery-distance-app
 
-Then visit:
+
+Then open:
+
 http://localhost:8000/docs
 
-
-
+Troubleshooting
+Problem	Likely Cause	Fix
+500 Internal Server Error	Redis not reachable	Use rediss:// for Upstash (TLS required)
+Database connection failed	Bad credentials or SSL not enabled	Add sslmode=require to your Postgres URL
+"8000" is not a valid port number	Quoted value in .env	Remove quotes from all env values
+Frontend not calling backend	Wrong API base URL	Update to http://localhost:8000 in frontend config
 Author
+
 Deepika Venkatesulu
 Email: deepikavenkatesulu009@gmail.com
 
 License
+
 MIT © 2025 Deepika Venkatesulu
 
 Quickstart Summary
-# clone repo
+# Clone repo
 git clone https://github.com/deepikavenkatesulu009-bot/delivery-distance-app.git
 cd delivery-distance-app
 
-# setup .env file
+# Setup .env file (see example above)
 
-# setup backend
+# Setup backend
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 
-# setup frontend (in new terminal)
+# Setup frontend (in new terminal)
 cd frontend
 npm install
 npm run dev
 
-# open
-Backend: http://localhost:8000/docs
+# Open in browser
+Backend:  http://localhost:8000/docs
 Frontend: http://localhost:5173
 
