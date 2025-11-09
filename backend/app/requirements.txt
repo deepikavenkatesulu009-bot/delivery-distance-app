@@ -10,3 +10,5 @@ aioredis
 pytest
 pytest-asyncio
 httpx
+gunicorn
+

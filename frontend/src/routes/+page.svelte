@@ -14,7 +14,15 @@
             </div>
   
           <div>
-            <button class="history-button" on:click={() => (location.href = '/history')}>View Historical Queries</button>
+            <a
+              href="/history"
+              role="button"
+              tabindex="0"
+              class="history-button"
+            >
+              View Historical Queries
+            </a>
+
           </div>
         </header>
   
