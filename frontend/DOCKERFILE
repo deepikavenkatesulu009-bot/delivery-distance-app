@@ -1,14 +1,29 @@
 # frontend/Dockerfile
+# Build stage
 FROM node:20-alpine AS build
 WORKDIR /app
+ENV PATH /app/node_modules/.bin:$PATH
+
+# Install deps
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --silent
+
+# Copy source & build
 COPY . .
 RUN npm run build
 
-# Serve static files with nginx
-FROM nginx:stable-alpine
-COPY --from=build /app/build /usr/share/nginx/html
+# Normalize build output into /app/dist
+RUN mkdir -p /app/dist \
+    && if [ -d /app/build ] && [ "/app/build" != "/app/dist" ]; then cp -a /app/build/. /app/dist/; fi \
+    && if [ -d /app/build/output ]; then cp -a /app/build/output/. /app/dist/; fi \
+    && if [ -d /app/.svelte-kit/output/client ]; then cp -a /app/.svelte-kit/output/client/. /app/dist/ || true; fi \
+    && if [ -d /app/dist_original ] && [ "/app/dist_original" != "/app/dist" ]; then cp -a /app/dist_original/. /app/dist/; fi \
+    && if [ -d /app/dist ]; then ls -la /app/dist; else ls -la /app; fi
+
+# Production stage (nginx) - serve static files
+FROM nginx:stable-alpine AS prod
+COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
