@@ -28,7 +28,7 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: DOCKERFILE
     depends_on:
       db:
         condition: service_healthy
@@ -47,7 +47,7 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: DOCKERFILE
     ports:
       - "3000:80"
     depends_on:
